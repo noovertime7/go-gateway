@@ -2,7 +2,7 @@
 [list]
     [list.default]
         driver_name = "mysql"
-        data_source_name = "root:1qaz@WSX@tcp(yuexue521.top:32306)/go_gateway?charset=utf8&parseTime=true&loc=Asia%2FChongqing"
+        data_source_name = "root:1qaz@WSX@tcp(101.42.222.161:32306)/go_gateway?charset=utf8&parseTime=true&loc=Asia%2FChongqing"
         max_open_conn = 20
         max_idle_conn = 10
         max_conn_life_time = 100
