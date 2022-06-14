@@ -3,6 +3,7 @@ package dto
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/go-gateway/public"
+	"time"
 )
 
 type AdminLoginInput struct {
@@ -12,6 +13,12 @@ type AdminLoginInput struct {
 
 type AdminLoginOut struct {
 	Token string `form:"token" json:"token" comment:"token"  example:"token"`
+}
+
+type AdminSessionInfo struct {
+	ID        int       `json:"id"`
+	UserName  string    `json:"username"`
+	LoginTime time.Time `json:"login_time"`
 }
 
 // BindValidParm 绑定并校验参数

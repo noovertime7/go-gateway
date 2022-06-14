@@ -1,11 +1,15 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/e421083458/golang_common/lib"
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/go-gateway/dao"
 	"github.com/noovertime7/go-gateway/dto"
 	"github.com/noovertime7/go-gateway/middleware"
+	"github.com/noovertime7/go-gateway/public"
+	"time"
 )
 
 type AdminLoginController struct {
@@ -33,15 +37,33 @@ func (a *AdminLoginController) AdminLogin(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 2000, err)
 		return
 	}
-
+	//获取数据库连接池
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(ctx, 2001, err)
 		return
 	}
+	//进行密码校验
 	admin := &dao.Admin{}
 	admin, err = admin.LoginCheck(ctx, tx, params)
 	if err != nil {
+		middleware.ResponseError(ctx, 2002, err)
+		return
+	}
+	//设置session
+	sessioninin := &dto.AdminSessionInfo{
+		ID:        admin.Id,
+		UserName:  admin.UserName,
+		LoginTime: time.Now(),
+	}
+	sessBts, err := json.Marshal(sessioninin)
+	if err != nil {
+		middleware.ResponseError(ctx, 2002, err)
+		return
+	}
+	sess := sessions.Default(ctx)
+	sess.Set(public.AdminSessionInfoKey, string(sessBts))
+	if err := sess.Save(); err != nil {
 		middleware.ResponseError(ctx, 2002, err)
 		return
 	}
