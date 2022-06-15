@@ -16,6 +16,7 @@ type AdminController struct {
 func AdminRegister(group *gin.RouterGroup) {
 	admininfo := &AdminController{}
 	group.GET("/admin_info", admininfo.AdminInfo)
+
 }
 
 func (a *AdminController) AdminInfo(ctx *gin.Context) {

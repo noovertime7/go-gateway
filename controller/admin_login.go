@@ -18,6 +18,7 @@ type AdminLoginController struct {
 func AdminLoginRegister(group *gin.RouterGroup) {
 	adminLogin := &AdminLoginController{}
 	group.POST("/login", adminLogin.AdminLogin)
+	group.GET("/loginout", adminLogin.AdminLoginOut)
 
 }
 
@@ -69,4 +70,15 @@ func (a *AdminLoginController) AdminLogin(ctx *gin.Context) {
 	}
 	out := &dto.AdminLoginOut{Token: admin.UserName}
 	middleware.ResponseSuccess(ctx, out)
+}
+
+func (a *AdminLoginController) AdminLoginOut(ctx *gin.Context) {
+	//获取数据库连接池
+	sess := sessions.Default(ctx)
+	sess.Delete(public.AdminSessionInfoKey)
+	if err := sess.Save(); err != nil {
+		middleware.ResponseError(ctx, 3002, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, "退出成功")
 }
