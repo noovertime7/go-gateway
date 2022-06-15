@@ -1,6 +1,10 @@
 package dto
 
-import "time"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/go-gateway/public"
+	"time"
+)
 
 type AdminInfoOutput struct {
 	ID           int       `json:"id"`
@@ -9,4 +13,12 @@ type AdminInfoOutput struct {
 	Avatar       string    `json:"avatar"`
 	Introduction string    `json:"introduction"`
 	Rules        []string  `json:"rules"`
+}
+
+type ChangePwdInput struct {
+	Password string `form:"password" json:"password" comment:"密码"   validate:"required" example:"123456"`
+}
+
+func (a *ChangePwdInput) BindValidParm(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, a)
 }

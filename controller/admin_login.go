@@ -19,7 +19,6 @@ func AdminLoginRegister(group *gin.RouterGroup) {
 	adminLogin := &AdminLoginController{}
 	group.POST("/login", adminLogin.AdminLogin)
 	group.GET("/loginout", adminLogin.AdminLoginOut)
-
 }
 
 // AdminLogin godoc
