@@ -49,3 +49,5 @@ func (s *ServiceInfo) Find(c *gin.Context, tx *gorm.DB, search *ServiceInfo) (*S
 func (s *ServiceInfo) Save(c *gin.Context, tx *gorm.DB) error {
 	return tx.WithContext(c).Save(s).Error
 }
+
+func (s *ServiceInfo) ServiceDetail(c *gin.Context, tx *gorm.DB, serch *ServiceInfo) {}
