@@ -15,6 +15,7 @@ type ServiceController struct{}
 func ServiceRegister(group *gin.RouterGroup) {
 	Serviceinfo := &ServiceController{}
 	group.POST("/service_list", Serviceinfo.ServiceList)
+	group.POST("/service_delete", Serviceinfo.ServiceDelete)
 
 }
 
@@ -24,7 +25,6 @@ func (s *ServiceController) ServiceList(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 30001, err)
 		return
 	}
-	fmt.Println(params)
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(ctx, 30002, err)
@@ -86,4 +86,30 @@ func (s *ServiceController) ServiceList(ctx *gin.Context) {
 		List:  outList,
 	}
 	middleware.ResponseSuccess(ctx, out)
+}
+
+func (s *ServiceController) ServiceDelete(ctx *gin.Context) {
+	params := &dto.ServiceDeleteInput{}
+	if err := params.BindValidParm(ctx); err != nil {
+		middleware.ResponseError(ctx, 30001, err)
+		return
+	}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 30002, err)
+		return
+	}
+	// 读取基本信息
+	serviceinfo := &dao.ServiceInfo{ID: params.ID}
+	serviceinfo, err = serviceinfo.Find(ctx, tx, serviceinfo)
+	if err != nil {
+		middleware.ResponseError(ctx, 30003, err)
+		return
+	}
+	serviceinfo.IsDelete = 1
+	if err := serviceinfo.Save(ctx, tx); err != nil {
+		middleware.ResponseError(ctx, 30004, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, "删除成功")
 }

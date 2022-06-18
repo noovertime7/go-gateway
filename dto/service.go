@@ -16,6 +16,10 @@ type ServiceListOutput struct {
 	List  []ServiceListItemOutput `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
 }
 
+type ServiceDeleteInput struct {
+	ID int64 `json:"id" form:"id" comment:"服务ID" validate:"required"` //id
+}
+
 type ServiceListItemOutput struct {
 	ID          int64  `json:"id" form:"id"`                     //id
 	ServiceName string `json:"service_name" form:"service_name"` //服务名称
@@ -28,5 +32,8 @@ type ServiceListItemOutput struct {
 }
 
 func (s *ServiceListInput) BindValidParm(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, s)
+}
+func (s *ServiceDeleteInput) BindValidParm(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, s)
 }
