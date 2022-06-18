@@ -10,6 +10,8 @@ import (
 	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
 	zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
 	"reflect"
+	"regexp"
+	"strings"
 )
 
 //设置Translation
@@ -45,16 +47,105 @@ func TranslationMiddleware() gin.HandlerFunc {
 
 			//自定义验证方法
 			//https://github.com/go-playground/validator/blob/v9/_examples/custom-validation/main.go
-			val.RegisterValidation("is_valid_username", func(fl validator.FieldLevel) bool {
+			val.RegisterValidation("valid_username", func(fl validator.FieldLevel) bool {
 				return fl.Field().String() == "admin"
+			})
+
+			//校验ServiceName
+			val.RegisterValidation("vaild_service_name", func(fl validator.FieldLevel) bool {
+				matched, _ := regexp.Match(`^[a-zA-Z0-9]{6,128}$`, []byte(fl.Field().String()))
+				return matched
+			})
+			//校验是否非空
+			val.RegisterValidation("vaild_rule", func(fl validator.FieldLevel) bool {
+				matched, _ := regexp.Match(`\S+`, []byte(fl.Field().String()))
+				return matched
+			})
+			val.RegisterValidation("vaild-urlwrite", func(fl validator.FieldLevel) bool {
+				if fl.Field().String() == "" {
+					return true
+				}
+				for _, ms := range strings.Split(fl.Field().String(), "\n") {
+					if len(strings.Split(ms, " ")) != 2 {
+						return false
+					}
+				}
+				return true
+			})
+			val.RegisterValidation("vaild-header_transfor", func(fl validator.FieldLevel) bool {
+				if fl.Field().String() == "" {
+					return true
+				}
+				for _, ms := range strings.Split(fl.Field().String(), "\n") {
+					if len(strings.Split(ms, " ")) != 3 {
+						return false
+					}
+				}
+				return true
+			})
+			val.RegisterValidation("valid_iplist", func(fl validator.FieldLevel) bool {
+
+				for _, ms := range strings.Split(fl.Field().String(), "\n") {
+					if matched, _ := regexp.Match(`^\S+`, []byte(ms)); !matched {
+						return false
+					}
+				}
+				return true
+			})
+			val.RegisterValidation("valid_weightlist", func(fl validator.FieldLevel) bool {
+				for _, ms := range strings.Split(fl.Field().String(), ",") {
+					if matched, _ := regexp.Match(`^\d+$`, []byte(ms)); !matched {
+						return false
+					}
+				}
+				return true
 			})
 
 			//自定义验证器
 			//https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
-			val.RegisterTranslation("is_valid_username", trans, func(ut ut.Translator) error {
-				return ut.Add("is_valid_username", "{0} 填写不正确哦", true)
+			val.RegisterTranslation("valid_username", trans, func(ut ut.Translator) error {
+				return ut.Add("valid_username", "{0} 填写不正确哦", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
-				t, _ := ut.T("is_valid_username", fe.Field())
+				t, _ := ut.T("valid_username", fe.Field())
+				return t
+			})
+
+			//校验ServiceName
+			val.RegisterTranslation("vaild_service_name", trans, func(ut ut.Translator) error {
+				return ut.Add("vaild_service_name", "{0} 不符合输入格式", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("vaild_service_name", fe.Field())
+				return t
+			})
+
+			val.RegisterTranslation("vaild_rule", trans, func(ut ut.Translator) error {
+				return ut.Add("vaild_rule", "{0} 必须为非空字符", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("vaild_rule", fe.Field())
+				return t
+			})
+			val.RegisterTranslation("vaild-urlwrite", trans, func(ut ut.Translator) error {
+				return ut.Add("vaild-urlwrite", "{0} 不符合输入格式", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("vaild-urlwrite", fe.Field())
+				return t
+			})
+			val.RegisterTranslation("vaild-header_transfor", trans, func(ut ut.Translator) error {
+				return ut.Add("vaild-header_transfor", "{0} 不符合输入格式", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("vaild-header_transfor", fe.Field())
+				return t
+			})
+			val.RegisterTranslation("valid_iplist", trans, func(ut ut.Translator) error {
+				return ut.Add("valid_iplist", "{0} 不符合输入格式", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("valid_iplist", fe.Field())
+				return t
+			})
+			val.RegisterTranslation("valid_weightlist", trans, func(ut ut.Translator) error {
+				return ut.Add("valid_weightlist", "{0} 不符合输入格式", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("valid_weightlist", fe.Field())
 				return t
 			})
 			break
