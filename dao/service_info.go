@@ -50,4 +50,39 @@ func (s *ServiceInfo) Save(c *gin.Context, tx *gorm.DB) error {
 	return tx.WithContext(c).Save(s).Error
 }
 
-func (s *ServiceInfo) ServiceDetail(c *gin.Context, tx *gorm.DB, serch *ServiceInfo) {}
+func (s *ServiceInfo) ServiceDetail(c *gin.Context, tx *gorm.DB, serch *ServiceInfo) (*ServiceDetail, error) {
+	httpRule := &HttpRule{ServiceID: serch.ID}
+	httpRule, err := httpRule.Find(c, tx, httpRule)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	tcpRule := &TcpRule{ServiceID: serch.ID}
+	tcpRule, err = tcpRule.Find(c, tx, tcpRule)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	grpcRule := &GrpcRule{ServiceID: serch.ID}
+	grpcRule, err = grpcRule.Find(c, tx, grpcRule)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	accessControl := &AccessControl{ServiceID: serch.ID}
+	accessControl, err = accessControl.Find(c, tx, accessControl)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	loadBalance := &LoadBalance{ServiceID: serch.ID}
+	loadBalance, err = loadBalance.Find(c, tx, loadBalance)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+
+	return &ServiceDetail{
+		Info:          serch,
+		HttpRule:      httpRule,
+		TcpRule:       tcpRule,
+		GRPCRule:      grpcRule,
+		LoadBalance:   loadBalance,
+		AccessControl: accessControl,
+	}, nil
+}
