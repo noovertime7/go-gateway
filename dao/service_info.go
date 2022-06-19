@@ -51,6 +51,13 @@ func (s *ServiceInfo) Save(c *gin.Context, tx *gorm.DB) error {
 }
 
 func (s *ServiceInfo) ServiceDetail(c *gin.Context, tx *gorm.DB, serch *ServiceInfo) (*ServiceDetail, error) {
+	if serch.ServiceName == "" {
+		info, err := s.Find(c, tx, serch)
+		if err != nil {
+			return nil, err
+		}
+		serch = info
+	}
 	httpRule := &HttpRule{ServiceID: serch.ID}
 	httpRule, err := httpRule.Find(c, tx, httpRule)
 	if err != nil && err != gorm.ErrRecordNotFound {

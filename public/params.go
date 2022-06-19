@@ -1,6 +1,7 @@
 package public
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/universal-translator"
 	"github.com/pkg/errors"
@@ -9,6 +10,7 @@ import (
 )
 
 func DefaultGetValidParams(c *gin.Context, params interface{}) error {
+	fmt.Println(params)
 	if err := c.ShouldBind(params); err != nil {
 		return err
 	}
