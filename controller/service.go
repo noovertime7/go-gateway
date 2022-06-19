@@ -9,7 +9,6 @@ import (
 	"github.com/noovertime7/go-gateway/middleware"
 	"github.com/noovertime7/go-gateway/public"
 	"github.com/pkg/errors"
-	"gorm.io/gorm"
 	"strings"
 )
 
@@ -48,14 +47,15 @@ func (s *ServiceController) ServiceHTTPAdd(ctx *gin.Context) {
 	//开启事务
 	tx = tx.Begin()
 	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
-	if _, err = serviceInfo.Find(ctx, tx, serviceInfo); err != nil && err == gorm.ErrRecordNotFound {
+	if res, err := serviceInfo.Find(ctx, tx, serviceInfo); err == nil && res.ID != 0 {
 		tx.Rollback()
 		middleware.ResponseError(ctx, 2002, errors.New("服务已存在"))
 		return
 	}
 
 	httpurl := &dao.HttpRule{RuleType: params.RuleType, Rule: params.Rule}
-	if httpurl, err = httpurl.Find(ctx, tx, httpurl); err == nil {
+	if httpurl, err = httpurl.Find(ctx, tx, httpurl); err == nil && httpurl.ID != 0 {
+		fmt.Println(httpurl)
 		tx.Rollback()
 		middleware.ResponseError(ctx, 2003, errors.New("前缀或域名已经存在"))
 		return
