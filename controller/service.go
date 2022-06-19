@@ -19,6 +19,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	group.POST("/service_list", Serviceinfo.ServiceList)
 	group.POST("/service_delete", Serviceinfo.ServiceDelete)
 	group.POST("/service_add", Serviceinfo.ServiceHTTPAdd)
+	group.POST("/service_update", Serviceinfo.ServiceHTTPUpdate)
 
 }
 
@@ -38,7 +39,10 @@ func (s *ServiceController) ServiceHTTPAdd(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 2000, err)
 		return
 	}
-
+	if len(strings.Split(params.IpList, "\n")) != len(strings.Split(params.WeightList, "\n")) {
+		middleware.ResponseError(ctx, 2004, errors.New("IP列表与权重数量不一致"))
+		return
+	}
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(ctx, 2001, err)
@@ -60,11 +64,7 @@ func (s *ServiceController) ServiceHTTPAdd(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 2003, errors.New("前缀或域名已经存在"))
 		return
 	}
-	if len(strings.Split(params.IpList, "\n")) != len(strings.Split(params.WeightList, "\n")) {
-		tx.Rollback()
-		middleware.ResponseError(ctx, 2004, errors.New("IP列表与权重数量不一致"))
-		return
-	}
+
 	serviceModel := &dao.ServiceInfo{
 		ServiceName: params.ServiceName,
 		ServiceDesc: params.ServiceDesc,
@@ -90,8 +90,119 @@ func (s *ServiceController) ServiceHTTPAdd(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 2005, err)
 		return
 	}
+
+	accessControl := &dao.AccessControl{
+		ServiceID:         serviceModel.ID,
+		OpenAuth:          params.OpenAuth,
+		BlackList:         params.BlackList,
+		WhiteList:         params.WhiteList,
+		ClientIPFlowLimit: params.ClientIpFlowLimit,
+		ServiceFlowLimit:  params.ServiceFlowLimit,
+	}
+	if err = accessControl.Save(ctx, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(ctx, 2006, err)
+		return
+	}
+
+	loadbalance := &dao.LoadBalance{
+		ServiceID:              serviceModel.ID,
+		RoundType:              params.RoundType,
+		IpList:                 params.IpList,
+		WeightList:             params.WhiteList,
+		UpstreamConnectTimeout: params.UpstreamConnectTimeout,
+		UpstreamHeaderTimeout:  params.UpstreamHeaderTimeout,
+		UpstreamIdleTimeout:    params.UpstreamIdleTimeout,
+		UpstreamMaxIdle:        params.UpstreamMaxIdle,
+	}
+
+	if err = loadbalance.Save(ctx, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(ctx, 2007, err)
+		return
+	}
+
 	tx.Commit()
-	middleware.ResponseSuccess(ctx, "")
+	middleware.ResponseSuccess(ctx, "添加成功")
+}
+
+// ServiceHTTPUpdate godoc
+// @Summary http表单修改
+// @Description http表单修改
+// @Tags http表单修改
+// @ID /service/service_update
+// @Accept  json
+// @Produce  json
+// @Param polygon body dto.ServiceUpdateInput true "body"
+// @Success 200  {object} middleware.Response{data=string} "success"
+// @Router /service/service_update [post]
+func (s *ServiceController) ServiceHTTPUpdate(ctx *gin.Context) {
+	params := &dto.ServiceADDInput{}
+	if err := params.BindValidParm(ctx); err != nil {
+		middleware.ResponseError(ctx, 2008, err)
+		return
+	}
+	if len(strings.Split(params.IpList, "\n")) != len(strings.Split(params.WeightList, "\n")) {
+		middleware.ResponseError(ctx, 2009, errors.New("IP列表与权重数量不一致"))
+		return
+	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 2009, err)
+		return
+	}
+
+	//开启事务
+	tx = tx.Begin()
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
+	serviceInfo, err = serviceInfo.Find(ctx, tx, serviceInfo)
+	servicedetail, err := serviceInfo.ServiceDetail(ctx, tx, serviceInfo)
+	if err != nil {
+		tx.Rollback()
+		middleware.ResponseError(ctx, 2010, errors.New("服务不存在"))
+		return
+	}
+	httpRule := servicedetail.HttpRule
+	httpRule.NeedHttps = params.NeedHttps
+	httpRule.NeedWebsocket = params.NeedWebsocket
+	httpRule.NeedStripUri = params.NeedStripUri
+	httpRule.UrlRewrite = params.UrlRewrite
+	httpRule.HeaderTransfor = params.HeaderTransfor
+	if err = httpRule.Save(ctx, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(ctx, 2011, err)
+		return
+	}
+
+	accessControl := servicedetail.AccessControl
+	accessControl.OpenAuth = params.OpenAuth
+	accessControl.BlackList = params.BlackList
+	accessControl.WhiteList = params.WhiteList
+	accessControl.ClientIPFlowLimit = params.ClientIpFlowLimit
+	accessControl.ServiceFlowLimit = params.ServiceFlowLimit
+	if err = accessControl.Save(ctx, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(ctx, 2012, err)
+		return
+	}
+
+	loadbalance := servicedetail.LoadBalance
+	loadbalance.RoundType = params.RoundType
+	loadbalance.IpList = params.IpList
+	loadbalance.WeightList = params.WhiteList
+	loadbalance.UpstreamConnectTimeout = params.UpstreamConnectTimeout
+	loadbalance.UpstreamHeaderTimeout = params.UpstreamHeaderTimeout
+	loadbalance.UpstreamIdleTimeout = params.UpstreamIdleTimeout
+	loadbalance.UpstreamMaxIdle = params.UpstreamMaxIdle
+	if err = loadbalance.Save(ctx, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(ctx, 2013, err)
+		return
+	}
+
+	tx.Commit()
+	middleware.ResponseSuccess(ctx, "更新成功")
 }
 
 func (s *ServiceController) ServiceList(ctx *gin.Context) {
