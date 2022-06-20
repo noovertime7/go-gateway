@@ -131,7 +131,6 @@ func (s *ServiceController) ServiceHTTPAdd(ctx *gin.Context) {
 
 	httpurl := &dao.HttpRule{RuleType: params.RuleType, Rule: params.Rule}
 	if httpurl, err = httpurl.Find(ctx, tx, httpurl); err == nil && httpurl.ID != 0 {
-		fmt.Println(httpurl)
 		tx.Rollback()
 		middleware.ResponseError(ctx, 2003, errors.New("前缀或域名已经存在"))
 		return
@@ -143,7 +142,6 @@ func (s *ServiceController) ServiceHTTPAdd(ctx *gin.Context) {
 	}
 	if err = serviceModel.Save(ctx, tx); err != nil {
 		tx.Rollback()
-		fmt.Println(err)
 		middleware.ResponseError(ctx, 2005, errors.New("serviceModel 保存数据库失败"))
 		return
 	}

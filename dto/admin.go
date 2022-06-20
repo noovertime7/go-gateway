@@ -12,7 +12,7 @@ type AdminInfoOutput struct {
 	LoginTime    time.Time `json:"login_time"`
 	Avatar       string    `json:"avatar"`
 	Introduction string    `json:"introduction"`
-	Rules        []string  `json:"rules"`
+	Roles        []string  `json:"roles"`
 }
 
 type ChangePwdInput struct {

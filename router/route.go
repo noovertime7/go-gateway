@@ -54,7 +54,6 @@ import (
 // @tokenUrl https://example.com/oauth/token
 // @authorizationurl https://example.com/oauth/authorize
 // @scope.admin Grants read and write access to administrative information
-
 // @x-extension-openapi {"example": "value on a json format"}
 
 func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {

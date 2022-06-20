@@ -36,9 +36,9 @@ func (a *AdminController) AdminInfo(ctx *gin.Context) {
 		ID:           adminsessioninfo.ID,
 		Name:         adminsessioninfo.UserName,
 		LoginTime:    adminsessioninfo.LoginTime,
-		Avatar:       "",
-		Introduction: "我是介绍",
-		Rules:        []string{"admin"},
+		Avatar:       "https://img2.woyaogexing.com/2022/06/19/b0be13535a86d0b0!400x400.jpg",
+		Introduction: "我是admin",
+		Roles:        []string{"admin"},
 	}
 	middleware.ResponseSuccess(ctx, out)
 }
