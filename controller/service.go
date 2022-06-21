@@ -19,7 +19,7 @@ func ServiceRegister(group *gin.RouterGroup) {
 	Serviceinfo := &ServiceController{}
 	group.POST("/service_detail", Serviceinfo.ServiceDetail)
 	group.POST("/service_stat", Serviceinfo.ServiceStat)
-	group.POST("/service_list", Serviceinfo.ServiceList)
+	group.GET("/service_list", Serviceinfo.ServiceList)
 	group.POST("/service_delete", Serviceinfo.ServiceDelete)
 	group.POST("/service_add", Serviceinfo.ServiceHTTPAdd)
 	group.POST("/service_update", Serviceinfo.ServiceHTTPUpdate)
@@ -340,6 +340,7 @@ func (s *ServiceController) ServiceList(ctx *gin.Context) {
 		iplist := serviceDetail.LoadBalance.GetIPListByModle()
 		outItem := dto.ServiceListItemOutput{
 			ID:          listIterm.ID,
+			LoadType:    listIterm.LoadType,
 			ServiceName: listIterm.ServiceName,
 			ServiceDesc: listIterm.ServiceDesc,
 			ServiceAddr: serviceAddr,

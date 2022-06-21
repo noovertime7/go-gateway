@@ -16,6 +16,17 @@ type ServiceListOutput struct {
 	List  []ServiceListItemOutput `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
 }
 
+type ServiceListItemOutput struct {
+	ID          int64  `json:"id" form:"id"`                     //id
+	ServiceName string `json:"service_name" form:"service_name"` //服务名称
+	ServiceDesc string `json:"service_desc" form:"service_desc"` //服务描述
+	LoadType    int    `json:"load_type" form:"load_type"`       //类型
+	ServiceAddr string `json:"service_addr" form:"service_addr"` //服务地址
+	Qps         int64  `json:"qps" form:"qps"`                   //qps
+	Qpd         int64  `json:"qpd" form:"qpd"`                   //qpd
+	TotalNode   int    `json:"total_node" form:"total_node"`     //节点数
+}
+
 type ServiceStatOutput struct {
 	Today     []int64 `form:"today" json:"today" comment:"今日流量"   validate:"" example:""`
 	Yesterday []int64 `form:"yesterday" json:"yesterday" comment:"昨日流量"   validate:"" example:""`
@@ -112,17 +123,6 @@ type ServiceUpdateInput struct {
 
 type ServiceDeleteInput struct {
 	ID int64 `json:"id" form:"id" comment:"服务ID" validate:""` //id
-}
-
-type ServiceListItemOutput struct {
-	ID          int64  `json:"id" form:"id"`                     //id
-	ServiceName string `json:"service_name" form:"service_name"` //服务名称
-	ServiceDesc string `json:"service_desc" form:"service_desc"` //服务描述
-	LoadType    int    `json:"load_type" form:"load_type"`       //类型
-	ServiceAddr string `json:"service_addr" form:"service_addr"` //服务地址
-	Qps         int64  `json:"qps" form:"qps"`                   //qps
-	Qpd         int64  `json:"qpd" form:"qpd"`                   //qpd
-	TotalNode   int    `json:"total_node" form:"total_node"`     //节点数
 }
 
 type ServiceAddGrpcInput struct {
