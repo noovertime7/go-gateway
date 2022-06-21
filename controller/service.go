@@ -20,14 +20,13 @@ func ServiceRegister(group *gin.RouterGroup) {
 	group.POST("/service_detail", Serviceinfo.ServiceDetail)
 	group.POST("/service_stat", Serviceinfo.ServiceStat)
 	group.GET("/service_list", Serviceinfo.ServiceList)
-	group.POST("/service_delete", Serviceinfo.ServiceDelete)
+	group.GET("/service_delete", Serviceinfo.ServiceDelete)
 	group.POST("/service_add", Serviceinfo.ServiceHTTPAdd)
 	group.POST("/service_update", Serviceinfo.ServiceHTTPUpdate)
 	group.POST("/service_add_tcp", Serviceinfo.ServiceAddTcp)
 	group.POST("/service_update_tcp", Serviceinfo.ServiceUpdateTcp)
 	group.POST("/service_add_grpc", Serviceinfo.ServiceAddGrpc)
 	group.POST("/service_update_grpc", Serviceinfo.ServiceUpdateGrpc)
-
 }
 
 func (s *ServiceController) ServiceDetail(ctx *gin.Context) {
