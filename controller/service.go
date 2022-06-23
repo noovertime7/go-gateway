@@ -17,7 +17,7 @@ type ServiceController struct{}
 
 func ServiceRegister(group *gin.RouterGroup) {
 	Serviceinfo := &ServiceController{}
-	group.POST("/service_detail", Serviceinfo.ServiceDetail)
+	group.GET("/service_detail", Serviceinfo.ServiceDetail)
 	group.POST("/service_stat", Serviceinfo.ServiceStat)
 	group.GET("/service_list", Serviceinfo.ServiceList)
 	group.GET("/service_delete", Serviceinfo.ServiceDelete)
