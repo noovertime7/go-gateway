@@ -211,7 +211,6 @@ func (s *ServiceController) ServiceHTTPUpdate(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 2008, err)
 		return
 	}
-	fmt.Println(params)
 	if len(strings.Split(params.IpList, "\n")) != len(strings.Split(params.WeightList, "\n")) {
 		middleware.ResponseError(ctx, 2009, errors.New("IP列表与权重数量不一致"))
 		return
