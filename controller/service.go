@@ -206,11 +206,12 @@ func (s *ServiceController) ServiceHTTPAdd(ctx *gin.Context) {
 // @Success 200  {object} middleware.Response{data=string} "success"
 // @Router /service/service_update [post]
 func (s *ServiceController) ServiceHTTPUpdate(ctx *gin.Context) {
-	params := &dto.ServiceADDInput{}
+	params := &dto.ServiceUpdateInput{}
 	if err := params.BindValidParm(ctx); err != nil {
 		middleware.ResponseError(ctx, 2008, err)
 		return
 	}
+	fmt.Println(params)
 	if len(strings.Split(params.IpList, "\n")) != len(strings.Split(params.WeightList, "\n")) {
 		middleware.ResponseError(ctx, 2009, errors.New("IP列表与权重数量不一致"))
 		return
@@ -272,7 +273,7 @@ func (s *ServiceController) ServiceHTTPUpdate(ctx *gin.Context) {
 	loadbalance := servicedetail.LoadBalance
 	loadbalance.RoundType = params.RoundType
 	loadbalance.IpList = params.IpList
-	loadbalance.WeightList = params.WhiteList
+	loadbalance.WeightList = params.WeightList
 	loadbalance.UpstreamConnectTimeout = params.UpstreamConnectTimeout
 	loadbalance.UpstreamHeaderTimeout = params.UpstreamHeaderTimeout
 	loadbalance.UpstreamIdleTimeout = params.UpstreamIdleTimeout
