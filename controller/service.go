@@ -18,7 +18,7 @@ type ServiceController struct{}
 func ServiceRegister(group *gin.RouterGroup) {
 	Serviceinfo := &ServiceController{}
 	group.GET("/service_detail", Serviceinfo.ServiceDetail)
-	group.POST("/service_stat", Serviceinfo.ServiceStat)
+	group.GET("/service_stat", Serviceinfo.ServiceStat)
 	group.GET("/service_list", Serviceinfo.ServiceList)
 	group.GET("/service_delete", Serviceinfo.ServiceDelete)
 	group.POST("/service_add", Serviceinfo.ServiceHTTPAdd)
@@ -82,11 +82,11 @@ func (s *ServiceController) ServiceStat(ctx *gin.Context) {
 
 	var todaylist []int64
 	for i := 0; i <= time.Now().Hour(); i++ {
-		todaylist = append(todaylist, 0)
+		todaylist = append(todaylist, 4)
 	}
 	var yesterdaylist []int64
 	for i := 0; i <= 23; i++ {
-		yesterdaylist = append(yesterdaylist, 0)
+		yesterdaylist = append(yesterdaylist, 5)
 	}
 	middleware.ResponseSuccess(ctx, &dto.ServiceStatOutput{
 		Today:     todaylist,
