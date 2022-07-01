@@ -404,7 +404,7 @@ func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 		ServiceName: params.ServiceName,
 		IsDelete:    0,
 	}
-	if _, err := infoSearch.Find(c, lib.GORMDefaultPool, infoSearch); err == nil {
+	if tmp, err := infoSearch.Find(c, lib.GORMDefaultPool, infoSearch); err == nil && tmp.ID != 0 {
 		middleware.ResponseError(c, 2002, errors.New("服务名被占用，请重新输入"))
 		return
 	}
@@ -413,14 +413,14 @@ func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 	tcpRuleSearch := &dao.TcpRule{
 		Port: params.Port,
 	}
-	if _, err := tcpRuleSearch.Find(c, lib.GORMDefaultPool, tcpRuleSearch); err == nil {
+	if tmp, err := tcpRuleSearch.Find(c, lib.GORMDefaultPool, tcpRuleSearch); err == nil && tmp.ID != 0 {
 		middleware.ResponseError(c, 2003, errors.New("服务端口被占用，请重新输入"))
 		return
 	}
 	grpcRuleSearch := &dao.GrpcRule{
 		Port: params.Port,
 	}
-	if _, err := grpcRuleSearch.Find(c, lib.GORMDefaultPool, grpcRuleSearch); err == nil {
+	if tmp, err := grpcRuleSearch.Find(c, lib.GORMDefaultPool, grpcRuleSearch); err == nil && tmp.ID != 0 {
 		middleware.ResponseError(c, 2004, errors.New("服务端口被占用，请重新输入"))
 		return
 	}
