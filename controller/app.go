@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/go-gateway/dao"
@@ -160,7 +161,7 @@ func (admin *APPController) AppAdd(c *gin.Context) {
 	search := &dao.App{
 		AppID: params.AppID,
 	}
-	if _, err := search.Find(c, lib.GORMDefaultPool, search); err == nil {
+	if tmp, err := search.Find(c, lib.GORMDefaultPool, search); err == nil && tmp.ID != 0 {
 		middleware.ResponseError(c, 2002, errors.New("租户ID被占用，请重新输入"))
 		return
 	}
@@ -259,7 +260,9 @@ func (admin *APPController) AppStatistics(c *gin.Context) {
 		return
 	}
 	currentTime := time.Now()
-	for i := 0; i <= time.Now().In(lib.TimeLocation).Hour(); i++ {
+	temp, err := time.LoadLocation("Asia/Shanghai")
+	for i := 0; i <= time.Now().In(temp).Hour(); i++ {
+		fmt.Println("lib.TimeLocation", temp)
 		dateTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 0, 0, 0, lib.TimeLocation)
 		hourData, _ := counter.GetHourData(dateTime)
 		todayStat = append(todayStat, hourData)
