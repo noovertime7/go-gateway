@@ -93,3 +93,13 @@ func (s *ServiceInfo) ServiceDetail(c *gin.Context, tx *gorm.DB, serch *ServiceI
 		AccessControl: accessControl,
 	}, nil
 }
+
+// GroupByLoadType 首页大盘分组查询
+func (t *ServiceInfo) GroupByLoadType(c *gin.Context, tx *gorm.DB) ([]dto.DashServiceStatItemOutput, error) {
+	var list []dto.DashServiceStatItemOutput
+	query := tx.WithContext(c)
+	if err := query.Table(t.TableName()).Where("is_delete=0").Select("load_type, count(*) as value").Group("load_type").Scan(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
+}

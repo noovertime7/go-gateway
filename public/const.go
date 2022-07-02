@@ -18,3 +18,11 @@ const (
 	FlowServicePrefix = "flow_service_"
 	FlowAppPrefix     = "flow_app_"
 )
+
+var (
+	LoadTypeMap = map[int]string{
+		LoadTypeHTTP: "HTTP",
+		LoadTypeTCP:  "TCP",
+		LoadTypeGRPC: "GRPC",
+	}
+)
